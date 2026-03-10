@@ -1,0 +1,7 @@
+#!/bin/sh
+
+echo "Running ktlint formatter..."
+./gradlew ktlintFormat
+
+echo "Running detekt..."
+./gradlew detekt

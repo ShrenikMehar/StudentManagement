@@ -4,5 +4,5 @@ import io.micronaut.runtime.Micronaut.run
 
 @Suppress("SpreadOperator")
 fun main(args: Array<String>) {
-	run(*args)
+    run(*args)
 }

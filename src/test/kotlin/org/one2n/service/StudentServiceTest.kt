@@ -10,7 +10,6 @@ import org.one2n.util.StudentTestData
 import java.util.UUID
 
 class StudentServiceTest {
-
     private val studentService = StudentService()
 
     @Test
@@ -57,10 +56,11 @@ class StudentServiceTest {
         val request = StudentTestData.studentRequest()
         val createdStudent = studentService.createStudent(request)
 
-        val updateRequest = StudentTestData.studentRequest(
-            name = "Bob",
-            age = 25
-        )
+        val updateRequest =
+            StudentTestData.studentRequest(
+                name = "Bob",
+                age = 25,
+            )
 
         val updatedStudent = studentService.updateStudent(createdStudent.id, updateRequest)
 
@@ -73,10 +73,11 @@ class StudentServiceTest {
     fun `should throw exception when updating non existing student`() {
         val id = UUID.randomUUID()
 
-        val request = StudentTestData.studentRequest(
-            name = "Bob",
-            age = 25
-        )
+        val request =
+            StudentTestData.studentRequest(
+                name = "Bob",
+                age = 25,
+            )
 
         assertThrows(HttpStatusException::class.java) {
             studentService.updateStudent(id, request)

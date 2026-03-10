@@ -1,4 +1,3 @@
 
 
-rootProject.name="student-management"
-
+rootProject.name = "student-management"

@@ -6,12 +6,13 @@ plugins {
     id("com.gradleup.shadow") version "8.3.9"
     id("io.micronaut.aot") version "4.6.2"
     id("io.gitlab.arturbosch.detekt") version "1.23.7"
+    id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
 }
 
 version = "0.1"
 group = "org.one2n"
 
-val kotlinVersion=project.properties.get("kotlinVersion")
+val kotlinVersion = project.properties.get("kotlinVersion")
 repositories {
     mavenCentral()
 }
@@ -21,15 +22,14 @@ dependencies {
     ksp("io.micronaut.serde:micronaut-serde-processor")
     implementation("io.micronaut.kotlin:micronaut-kotlin-runtime")
     implementation("io.micronaut.serde:micronaut-serde-jackson")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
     compileOnly("io.micronaut:micronaut-http-client")
     runtimeOnly("ch.qos.logback:logback-classic")
     runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
     testImplementation("io.micronaut:micronaut-http-client")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
-
 
 application {
     mainClass = "org.one2n.ApplicationKt"
@@ -39,7 +39,6 @@ java {
         languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
-
 
 graalvmNative.toolchainDetection = false
 
@@ -64,7 +63,6 @@ micronaut {
     }
 }
 
-
 tasks.named<io.micronaut.gradle.docker.NativeImageDockerfile>("dockerfileNative") {
     jdkVersion = "21"
 }
@@ -76,6 +74,12 @@ detekt {
     config.setFrom(files("$rootDir/detekt.yml"))
 }
 
+ktlint {
+    verbose.set(true)
+    outputToConsole.set(true)
+}
+
 tasks.named("check") {
     dependsOn("detekt")
+    dependsOn("ktlintCheck")
 }

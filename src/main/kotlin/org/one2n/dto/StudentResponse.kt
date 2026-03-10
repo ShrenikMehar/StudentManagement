@@ -8,5 +8,5 @@ data class StudentResponse(
     val id: UUID,
     val name: String,
     val age: Int,
-    val email: String
+    val email: String,
 )

@@ -15,9 +15,8 @@ import java.util.UUID
 
 @Controller("/api/v1/students")
 class StudentController(
-    private val studentService: StudentService
+    private val studentService: StudentService,
 ) {
-
     private val logger = LoggerFactory.getLogger(StudentController::class.java)
 
     @Get
@@ -30,7 +29,9 @@ class StudentController(
     }
 
     @Post
-    fun createStudent(@Body request: StudentRequest): StudentResponse {
+    fun createStudent(
+        @Body request: StudentRequest,
+    ): StudentResponse {
         logger.debug("Received request to create student")
         val student = studentService.createStudent(request)
 
@@ -39,7 +40,9 @@ class StudentController(
     }
 
     @Get("/{id}")
-    fun getStudentById(@PathVariable id: UUID): StudentResponse {
+    fun getStudentById(
+        @PathVariable id: UUID,
+    ): StudentResponse {
         logger.debug("Received request to fetch student with id={}", id)
         val student = studentService.getStudentById(id)
 
@@ -48,7 +51,10 @@ class StudentController(
     }
 
     @Put("/{id}")
-    fun updateStudent(@PathVariable id: UUID, @Body request: StudentRequest): StudentResponse {
+    fun updateStudent(
+        @PathVariable id: UUID,
+        @Body request: StudentRequest,
+    ): StudentResponse {
         logger.debug("Received request to update student with id={}", id)
 
         val updatedStudent = studentService.updateStudent(id, request)
@@ -58,7 +64,9 @@ class StudentController(
     }
 
     @Delete("/{id}")
-    fun deleteStudent(@PathVariable id: UUID): StudentResponse {
+    fun deleteStudent(
+        @PathVariable id: UUID,
+    ): StudentResponse {
         logger.debug("Received request to delete student with id={}", id)
         val deletedStudent = studentService.deleteStudent(id)
 

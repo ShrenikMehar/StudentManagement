@@ -6,5 +6,5 @@ import io.micronaut.serde.annotation.Serdeable
 data class StudentRequest(
     val name: String,
     val age: Int,
-    val email: String
+    val email: String,
 )

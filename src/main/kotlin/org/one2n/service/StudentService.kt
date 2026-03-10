@@ -10,7 +10,6 @@ import java.util.UUID
 
 @Singleton
 class StudentService {
-
     private val students = mutableListOf<StudentResponse>()
     private val logger = LoggerFactory.getLogger(StudentService::class.java)
 
@@ -21,12 +20,13 @@ class StudentService {
 
     fun createStudent(request: StudentRequest): StudentResponse {
         logger.debug("Creating new student")
-        val student = StudentResponse(
-            id = UUID.randomUUID(),
-            name = request.name,
-            age = request.age,
-            email = request.email
-        )
+        val student =
+            StudentResponse(
+                id = UUID.randomUUID(),
+                name = request.name,
+                age = request.age,
+                email = request.email,
+            )
 
         students.add(student)
 
@@ -50,16 +50,20 @@ class StudentService {
         return student
     }
 
-    fun updateStudent(id: UUID, request: StudentRequest): StudentResponse {
+    fun updateStudent(
+        id: UUID,
+        request: StudentRequest,
+    ): StudentResponse {
         logger.debug("Updating student with id={}", id)
         val existingStudent = findStudentOrThrow(id)
 
-        val updatedStudent = StudentResponse(
-            id = id,
-            name = request.name,
-            age = request.age,
-            email = request.email
-        )
+        val updatedStudent =
+            StudentResponse(
+                id = id,
+                name = request.name,
+                age = request.age,
+                email = request.email,
+            )
 
         val index = students.indexOf(existingStudent)
         students[index] = updatedStudent

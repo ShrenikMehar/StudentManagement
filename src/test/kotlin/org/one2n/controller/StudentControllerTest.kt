@@ -17,7 +17,6 @@ import java.util.UUID
 
 @MicronautTest
 class StudentControllerTest {
-
     @Inject
     @field:Client("/")
     lateinit var client: HttpClient
@@ -46,8 +45,9 @@ class StudentControllerTest {
         val requestBody = StudentTestData.studentRequest()
         val request = HttpRequest.POST("/api/v1/students", requestBody)
 
-        val response = client.toBlocking()
-            .retrieve(request, StudentResponse::class.java)
+        val response =
+            client.toBlocking()
+                .retrieve(request, StudentResponse::class.java)
 
         assertEquals("Alice", response.name)
         assertEquals(20, response.age)
@@ -59,13 +59,15 @@ class StudentControllerTest {
         val requestBody = StudentTestData.studentRequest()
         val request = HttpRequest.POST("/api/v1/students", requestBody)
 
-        val createdStudent = client.toBlocking()
-            .retrieve(request, StudentResponse::class.java)
+        val createdStudent =
+            client.toBlocking()
+                .retrieve(request, StudentResponse::class.java)
 
         val getRequest = HttpRequest.GET<Any>("/api/v1/students/${createdStudent.id}")
 
-        val fetchedStudent = client.toBlocking()
-            .retrieve(getRequest, StudentResponse::class.java)
+        val fetchedStudent =
+            client.toBlocking()
+                .retrieve(getRequest, StudentResponse::class.java)
 
         assertEquals(createdStudent.id, fetchedStudent.id)
     }
@@ -86,18 +88,21 @@ class StudentControllerTest {
         val requestBody = StudentTestData.studentRequest()
         val createRequest = HttpRequest.POST("/api/v1/students", requestBody)
 
-        val createdStudent = client.toBlocking()
-            .retrieve(createRequest, StudentResponse::class.java)
+        val createdStudent =
+            client.toBlocking()
+                .retrieve(createRequest, StudentResponse::class.java)
 
-        val updateRequest = StudentTestData.studentRequest(
-            name = "Bob",
-            age = 25
-        )
+        val updateRequest =
+            StudentTestData.studentRequest(
+                name = "Bob",
+                age = 25,
+            )
 
         val putRequest = HttpRequest.PUT("/api/v1/students/${createdStudent.id}", updateRequest)
 
-        val updatedStudent = client.toBlocking()
-            .retrieve(putRequest, StudentResponse::class.java)
+        val updatedStudent =
+            client.toBlocking()
+                .retrieve(putRequest, StudentResponse::class.java)
 
         assertEquals(createdStudent.id, updatedStudent.id)
         assertEquals("Bob", updatedStudent.name)
@@ -108,10 +113,11 @@ class StudentControllerTest {
     fun `should return 404 when updating non existing student`() {
         val id = UUID.randomUUID()
 
-        val requestBody = StudentTestData.studentRequest(
-            name = "Bob",
-            age = 25
-        )
+        val requestBody =
+            StudentTestData.studentRequest(
+                name = "Bob",
+                age = 25,
+            )
         val request = HttpRequest.PUT("/api/v1/students/$id", requestBody)
 
         assertThrows(HttpClientResponseException::class.java) {
@@ -122,14 +128,16 @@ class StudentControllerTest {
     @Test
     fun `should delete student`() {
         val requestBody = StudentTestData.studentRequest()
-        val createdStudent = client.toBlocking()
-            .retrieve(HttpRequest.POST("/api/v1/students", requestBody), StudentResponse::class.java)
+        val createdStudent =
+            client.toBlocking()
+                .retrieve(HttpRequest.POST("/api/v1/students", requestBody), StudentResponse::class.java)
 
-        val deletedStudent = client.toBlocking()
-            .retrieve(
-                HttpRequest.DELETE<Any>("/api/v1/students/${createdStudent.id}"),
-                StudentResponse::class.java
-            )
+        val deletedStudent =
+            client.toBlocking()
+                .retrieve(
+                    HttpRequest.DELETE<Any>("/api/v1/students/${createdStudent.id}"),
+                    StudentResponse::class.java,
+                )
 
         assertEquals(createdStudent.id, deletedStudent.id)
     }
