@@ -118,4 +118,30 @@ class StudentControllerTest {
             client.toBlocking().retrieve(request)
         }
     }
+
+    @Test
+    fun `should delete student`() {
+        val requestBody = StudentTestData.studentRequest()
+        val createdStudent = client.toBlocking()
+            .retrieve(HttpRequest.POST("/api/v1/students", requestBody), StudentResponse::class.java)
+
+        val deletedStudent = client.toBlocking()
+            .retrieve(
+                HttpRequest.DELETE<Any>("/api/v1/students/${createdStudent.id}"),
+                StudentResponse::class.java
+            )
+
+        assertEquals(createdStudent.id, deletedStudent.id)
+    }
+
+    @Test
+    fun `should return 404 when deleting non existing student`() {
+        val id = UUID.randomUUID()
+
+        val request = HttpRequest.DELETE<Any>("/api/v1/students/$id")
+
+        assertThrows(HttpClientResponseException::class.java) {
+            client.toBlocking().retrieve(request, StudentResponse::class.java)
+        }
+    }
 }

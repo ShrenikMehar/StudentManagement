@@ -79,4 +79,25 @@ class StudentServiceTest {
             studentService.updateStudent(id, request)
         }
     }
+
+    @Test
+    fun `should delete student`() {
+        val request = StudentTestData.studentRequest()
+        val createdStudent = studentService.createStudent(request)
+
+        studentService.deleteStudent(createdStudent.id)
+
+        val students = studentService.getAllStudents()
+
+        assertTrue(students.none { it.id == createdStudent.id })
+    }
+
+    @Test
+    fun `should throw exception when deleting non existing student`() {
+        val id = UUID.randomUUID()
+
+        assertThrows(HttpStatusException::class.java) {
+            studentService.deleteStudent(id)
+        }
+    }
 }

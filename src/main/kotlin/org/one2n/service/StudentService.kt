@@ -53,4 +53,12 @@ class StudentService {
 
         return updatedStudent
     }
+
+    fun deleteStudent(id: UUID): StudentResponse {
+        val student = findStudentOrThrow(id)
+
+        students.remove(student)
+
+        return student
+    }
 }
