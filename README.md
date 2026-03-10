@@ -1,28 +1,81 @@
-## Micronaut 4.10.9 Documentation
+# Student REST API
 
-- [User Guide](https://docs.micronaut.io/4.10.9/guide/index.html)
-- [API Reference](https://docs.micronaut.io/4.10.9/api/index.html)
-- [Configuration Reference](https://docs.micronaut.io/4.10.9/guide/configurationreference.html)
-- [Micronaut Guides](https://guides.micronaut.io/index.html)
----
+## Overview
 
-- [Shadow Gradle Plugin](https://gradleup.com/shadow/)
-- [Micronaut Gradle Plugin documentation](https://micronaut-projects.github.io/micronaut-gradle-plugin/latest/)
-- [GraalVM Gradle Plugin documentation](https://graalvm.github.io/native-build-tools/latest/gradle-plugin.html)
-## Feature serialization-jackson documentation
+This project implements a simple REST API to manage student records.
+The API allows clients to create, retrieve, update, and delete student information.
 
-- [Micronaut Serialization Jackson Core documentation](https://micronaut-projects.github.io/micronaut-serialization/latest/guide/)
+The service follows common REST API best practices and the principles of the Twelve-Factor App methodology.
 
+## Features (not implemented yet)
 
-## Feature ksp documentation
+* Add a new student
+* Get all students
+* Get a student by ID
+* Update student information
+* Delete a student record
+* Health check endpoint
 
-- [Micronaut Kotlin Symbol Processing (KSP) documentation](https://docs.micronaut.io/latest/guide/#kotlin)
+## API Base Path
 
-- [https://kotlinlang.org/docs/ksp-overview.html](https://kotlinlang.org/docs/ksp-overview.html)
+```
+/api/v1/students
+```
 
+## API Endpoints
 
-## Feature micronaut-aot documentation
+| Method | Endpoint              | Description                 |
+| ------ | --------------------- | --------------------------- |
+| POST   | /api/v1/students      | Create a new student        |
+| GET    | /api/v1/students      | Retrieve all students       |
+| GET    | /api/v1/students/{id} | Retrieve a specific student |
+| PUT    | /api/v1/students/{id} | Update a student            |
+| DELETE | /api/v1/students/{id} | Delete a student            |
+| GET    | /healthcheck          | Service health status       |
 
-- [Micronaut AOT documentation](https://micronaut-projects.github.io/micronaut-aot/latest/guide/)
+## Tech Stack
 
+* Language: Kotlin
+* Framework: Micronaut
+* Database: PostgreSQL
+* Migrations: Flyway
+* Build Tool: Gradle
+* Testing: JUnit
 
+## Environment Variables
+
+Configuration values are provided through environment variables.
+
+Example:
+
+```
+DB_HOST
+DB_PORT
+DB_NAME
+DB_USER
+DB_PASSWORD
+```
+
+## Running the Application (Planned)
+
+```
+make db
+make run
+```
+
+## Testing (Planned)
+
+```
+make test
+```
+
+## Repository Goals
+
+This project demonstrates:
+
+* REST API best practices
+* API versioning
+* Database migrations
+* Environment based configuration
+* Logging and health checks
+* Unit testing
