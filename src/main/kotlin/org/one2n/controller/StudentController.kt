@@ -5,6 +5,7 @@ import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.PathVariable
 import io.micronaut.http.annotation.Post
+import io.micronaut.http.annotation.Put
 import org.one2n.dto.StudentRequest
 import org.one2n.dto.StudentResponse
 import org.one2n.service.StudentService
@@ -28,5 +29,10 @@ class StudentController(
     @Get("/{id}")
     fun getStudentById(@PathVariable id: UUID): StudentResponse {
         return studentService.getStudentById(id)
+    }
+
+    @Put("/{id}")
+    fun updateStudent(@PathVariable id: UUID, @Body request: StudentRequest): StudentResponse {
+        return studentService.updateStudent(id, request)
     }
 }

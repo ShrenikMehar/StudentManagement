@@ -48,4 +48,21 @@ class StudentServiceTest {
             studentService.getStudentById(id)
         }
     }
+
+    @Test
+    fun `should update student`() {
+        val request = StudentTestData.studentRequest()
+        val createdStudent = studentService.createStudent(request)
+
+        val updateRequest = StudentTestData.studentRequest(
+            name = "Bob",
+            age = 25
+        )
+
+        val updatedStudent = studentService.updateStudent(createdStudent.id, updateRequest)
+
+        assertEquals(createdStudent.id, updatedStudent.id)
+        assertEquals("Bob", updatedStudent.name)
+        assertEquals(25, updatedStudent.age)
+    }
 }

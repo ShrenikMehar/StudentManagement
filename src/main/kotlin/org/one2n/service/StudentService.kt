@@ -37,4 +37,20 @@ class StudentService {
         return students.find { it.id == id }
             ?: throw HttpStatusException(HttpStatus.NOT_FOUND, "Student not found")
     }
+
+    fun updateStudent(id: UUID, request: StudentRequest): StudentResponse {
+        val existingStudent = findStudentOrThrow(id)
+
+        val updatedStudent = StudentResponse(
+            id = id,
+            name = request.name,
+            age = request.age,
+            email = request.email
+        )
+
+        val index = students.indexOf(existingStudent)
+        students[index] = updatedStudent
+
+        return updatedStudent
+    }
 }

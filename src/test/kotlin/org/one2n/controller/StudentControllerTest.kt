@@ -80,4 +80,27 @@ class StudentControllerTest {
             client.toBlocking().retrieve(request)
         }
     }
+
+    @Test
+    fun `should update student`() {
+        val requestBody = StudentTestData.studentRequest()
+        val createRequest = HttpRequest.POST("/api/v1/students", requestBody)
+
+        val createdStudent = client.toBlocking()
+            .retrieve(createRequest, StudentResponse::class.java)
+
+        val updateRequest = StudentTestData.studentRequest(
+            name = "Bob",
+            age = 25
+        )
+
+        val putRequest = HttpRequest.PUT("/api/v1/students/${createdStudent.id}", updateRequest)
+
+        val updatedStudent = client.toBlocking()
+            .retrieve(putRequest, StudentResponse::class.java)
+
+        assertEquals(createdStudent.id, updatedStudent.id)
+        assertEquals("Bob", updatedStudent.name)
+        assertEquals(25, updatedStudent.age)
+    }
 }
