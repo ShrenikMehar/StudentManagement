@@ -1,0 +1,156 @@
+{
+  "info": {
+    "_postman_id": "03e633ad-87f1-4bc1-96e8-d478c1b2dd26",
+    "name": "Student API",
+    "description": "# Student API\n\nThe **Student API** is a RESTful service for managing student records. It provides a complete set of **CRUD** (Create, Read, Update, Delete) operations, allowing clients to create new students, retrieve individual or all student records, update existing entries, and delete students by ID.\n\n## Base URL\n\n```\nhttp://localhost:8080\n\n ```\n\n## Endpoints\n\n| Method | Endpoint | Description |\n| --- | --- | --- |\n| `POST` | `/api/v1/students` | Create a new student record |\n| `GET` | `/api/v1/students` | Retrieve a list of all students |\n| `GET` | `/api/v1/students/{id}` | Fetch a specific student by their ID |\n| `PUT` | `/api/v1/students/{id}` | Update an existing student's details |\n| `DELETE` | `/api/v1/students/{id}` | Remove a student record by ID |\n\n## Health Check\n\nA health check endpoint is available to verify that the service is up and running:\n\n| Method | Endpoint | Description |\n| --- | --- | --- |\n| `GET` | `/healthcheck` | Returns the current health status of the API |",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "32767552"
+  },
+  "item": [
+    {
+      "name": "Create Student",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Alice\",\n  \"age\": 20,\n  \"email\": \"alice@test.com\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/v1/students",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "v1",
+            "students"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get all students",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/v1/students",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "v1",
+            "students"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get student by ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/v1/students/{id}",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "v1",
+            "students",
+            "{id}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update student",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Alice Updated\",\n  \"age\": 21,\n  \"email\": \"alice@test.com\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/v1/students/{id}",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "v1",
+            "students",
+            "{id}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete student",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/v1/students/{id}",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "v1",
+            "students",
+            "{id}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Healthcheck",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/healthcheck",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "healthcheck"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

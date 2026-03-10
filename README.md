@@ -205,6 +205,26 @@ Execute the test suite using:
 
 ---
 
+## Postman Collection
+
+A Postman collection is included to test the API.
+
+Location:
+
+```
+postman/student-api.postman_collection.json
+```
+
+### Import
+
+1. Open Postman
+2. Click **Import**
+3. Select the file above
+
+Make sure the application is running locally (`http://localhost:8080`) before sending requests.
+
+---
+
 ## Project Structure
 
 ```
