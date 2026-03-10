@@ -2,7 +2,7 @@ package org.one2n.service
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import org.one2n.dto.StudentRequest
+import org.one2n.util.StudentTestData
 
 class StudentServiceTest {
 
@@ -17,12 +17,7 @@ class StudentServiceTest {
 
     @Test
     fun `should create student`() {
-
-        val request = StudentRequest(
-            name = "Alice",
-            age = 20,
-            email = "alice@test.com"
-        )
+        val request = StudentTestData.studentRequest()
 
         val student = studentService.createStudent(request)
 

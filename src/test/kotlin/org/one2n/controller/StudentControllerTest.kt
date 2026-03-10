@@ -7,8 +7,8 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import jakarta.inject.Inject
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.one2n.dto.StudentRequest
 import org.one2n.dto.StudentResponse
+import org.one2n.util.StudentTestData
 
 @MicronautTest
 class StudentControllerTest {
@@ -28,13 +28,7 @@ class StudentControllerTest {
 
     @Test
     fun `should create student`() {
-
-        val requestBody = StudentRequest(
-            name = "Alice",
-            age = 20,
-            email = "alice@test.com"
-        )
-
+        val requestBody = StudentTestData.studentRequest()
         val request = HttpRequest.POST("/api/v1/students", requestBody)
 
         val response = client.toBlocking()
