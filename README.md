@@ -14,6 +14,7 @@ The project also demonstrates good backend engineering practices such as:
 * CI validation
 * structured logging
 * Git hooks for local quality checks
+* database migrations
 
 ---
 
@@ -28,8 +29,7 @@ The API currently supports the following operations:
 * Delete a student record
 * Health check endpoint
 
-Students are currently stored using an **in-memory data store**.
-A database layer will be introduced in a later milestone.
+Student data is persisted in PostgreSQL, and database schema management is handled using Flyway migrations.
 
 ---
 
@@ -58,6 +58,8 @@ A database layer will be introduced in a later milestone.
 
 * **Language:** Kotlin
 * **Framework:** Micronaut
+* **Database:** PostgreSQL
+* **Database Migration:** Flyway
 * **Build Tool:** Gradle
 * **Testing:** JUnit 5
 * **Logging:** Logback
@@ -155,9 +157,34 @@ The Gradle build is configured to use the **Java 21 toolchain**.
 
 ---
 
+### Docker
+
+PostgreSQL is run using Docker via the provided `docker-compose.yml`.
+
+Start the database:
+
+```bash
+make db-up
+```
+
+Stop the database:
+
+```bash
+make db-down
+```
+
+Alternatively you can run Docker commands directly:
+
+```bash
+docker compose up -d
+docker compose down
+```
+
+---
+
 ### Git
 
-Git is required to clone the repository and enable the provided Git hooks.
+Git is required to clone the repository and enable Git hooks.
 
 ```
 git --version
@@ -181,7 +208,7 @@ Start the API locally:
 make run
 ```
 
-The service will start on the default Micronaut port (`http://localhost:8080`).
+The service will start on the default Micronaut port (`http://localhost:8080`). Make sure the PostgreSQL database is running before starting the application.
 
 ---
 
@@ -228,24 +255,29 @@ Ensure the application is running (`http://localhost:8080`) before sending reque
 ## Project Structure
 
 ```
-src/main/kotlin    → application source code
-src/test/kotlin    → unit tests
-.githooks          → git hooks (pre-commit, pre-push)
-scripts            → developer setup scripts
-postman            → API testing collection
+src/main/kotlin
+  controller     → REST controllers
+  service        → business logic
+  repository     → database access
+  entity         → database entities
+  dto            → request/response models
+
+src/main/resources
+  db/migration   → Flyway database migrations
+
+src/test/kotlin  → unit tests
+
+.githooks        → git hooks (pre-commit, pre-push)
+scripts          → developer setup scripts
+postman          → API testing collection
 ```
 
 ---
 
-## Planned Improvements
+## Future Improvements
 
-The following features will be added in future milestones:
+Possible enhancements for future iterations:
 
-* PostgreSQL database integration
-* Flyway database migrations
-* Repository layer
-* environment based configuration
-* OpenAPI / Swagger documentation
 * API request validation
 * pagination support
-* Docker support
+* Dockerized application deployment

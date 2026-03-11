@@ -1,5 +1,3 @@
-.PHONY: build run test lint format
-
 build:
 	./gradlew build
 
@@ -14,3 +12,9 @@ lint:
 
 format:
 	./gradlew ktlintFormat
+
+db-up:
+	docker-compose up -d
+
+db-down:
+	docker-compose down
