@@ -17,8 +17,9 @@ class StudentService(
     private val logger = LoggerFactory.getLogger(StudentService::class.java)
 
     fun getAllStudents(): List<StudentResponse> {
-        val students = studentRepository.findAll().toList()
-        logger.debug("Fetching all students, count={}", students.size)
+        val students = studentRepository.findAll()
+
+        logger.debug("Fetching all students")
 
         return students.map { it.toResponse() }
     }
@@ -26,34 +27,19 @@ class StudentService(
     fun createStudent(request: StudentRequest): StudentResponse {
         logger.debug("Creating new student")
 
-        val student =
-            Student(
-                id = UUID.randomUUID(),
-                name = request.name,
-                age = request.age,
-                email = request.email,
-            )
+        val student = request.toEntity()
 
         val savedStudent = studentRepository.save(student)
 
         logger.info("Student created with id={}", savedStudent.id)
+
         return savedStudent.toResponse()
     }
 
     fun getStudentById(id: UUID): StudentResponse {
         logger.debug("Looking up student with id={}", id)
+
         return findStudentOrThrow(id).toResponse()
-    }
-
-    private fun findStudentOrThrow(id: UUID): Student {
-        val student = studentRepository.findById(id)
-
-        if (student.isEmpty) {
-            logger.warn("Student not found for id={}", id)
-            throw HttpStatusException(HttpStatus.NOT_FOUND, "Student not found")
-        }
-
-        return student.get()
     }
 
     fun updateStudent(
@@ -74,6 +60,7 @@ class StudentService(
         val savedStudent = studentRepository.update(updatedStudent)
 
         logger.info("Student updated with id={}", id)
+
         return savedStudent.toResponse()
     }
 
@@ -85,15 +72,30 @@ class StudentService(
         studentRepository.deleteById(id)
 
         logger.info("Student deleted with id={}", id)
+
         return student.toResponse()
     }
 
-    private fun Student.toResponse(): StudentResponse {
-        return StudentResponse(
-            id = this.id,
-            name = this.name,
-            age = this.age,
-            email = this.email,
+    private fun findStudentOrThrow(id: UUID): Student =
+        studentRepository.findById(id)
+            .orElseThrow {
+                logger.warn("Student not found for id={}", id)
+                HttpStatusException(HttpStatus.NOT_FOUND, "Student not found")
+            }
+
+    private fun Student.toResponse(): StudentResponse =
+        StudentResponse(
+            id = id,
+            name = name,
+            age = age,
+            email = email,
         )
-    }
+
+    private fun StudentRequest.toEntity(): Student =
+        Student(
+            id = UUID.randomUUID(),
+            name = name,
+            age = age,
+            email = email,
+        )
 }
