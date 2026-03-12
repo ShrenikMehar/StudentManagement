@@ -7,12 +7,15 @@ import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.PathVariable
 import io.micronaut.http.annotation.Post
 import io.micronaut.http.annotation.Put
+import io.micronaut.validation.Validated
+import jakarta.validation.Valid
 import org.one2n.dto.StudentRequest
 import org.one2n.dto.StudentResponse
 import org.one2n.service.StudentService
 import org.slf4j.LoggerFactory
 import java.util.UUID
 
+@Validated
 @Controller("/api/v1/students")
 class StudentController(
     private val studentService: StudentService,
@@ -30,7 +33,7 @@ class StudentController(
 
     @Post
     fun createStudent(
-        @Body request: StudentRequest,
+        @Body @Valid request: StudentRequest,
     ): StudentResponse {
         logger.debug("Received request to create student")
         val student = studentService.createStudent(request)
@@ -53,7 +56,7 @@ class StudentController(
     @Put("/{id}")
     fun updateStudent(
         @PathVariable id: UUID,
-        @Body request: StudentRequest,
+        @Body @Valid request: StudentRequest,
     ): StudentResponse {
         logger.debug("Received request to update student with id={}", id)
 
