@@ -1,3 +1,5 @@
+.PHONY: build run stop logs db-up db-down local-build local-run local-test lint format
+
 IMAGE_NAME=student-api
 VERSION ?= 1.0.0
 
