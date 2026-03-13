@@ -16,6 +16,7 @@ The project also demonstrates good backend engineering practices such as:
 * Git hooks for local quality checks
 * database migrations
 * containerized deployment using Docker
+* infrastructure provisioning using Vagrant
 
 ---
 
@@ -68,6 +69,7 @@ Student data is stored in **PostgreSQL**, and schema management is handled using
 * **Formatting:** ktlint
 * **CI:** GitHub Actions
 * **Containerization:** Docker
+* **Infrastructure:** Vagrant
 
 ---
 
@@ -170,6 +172,218 @@ make db-down
 
 ---
 
+## Bare Metal Deployment (Vagrant)
+
+The project can also be deployed inside a **virtual machine that simulates a production environment**.
+
+This VM runs the application stack using **Docker containers**, similar to how services would run on a real server.
+
+### Architecture
+
+Current deployment architecture:
+
+```
+Client
+   │
+   ▼
+Student API Container
+   │
+   ▼
+PostgreSQL Container
+```
+
+Future stages introduce horizontal scaling and load balancing:
+
+```
+Client
+   │
+   ▼
+Nginx Load Balancer
+   │
+   ├── Student API Instance 1
+   └── Student API Instance 2
+          │
+          ▼
+        PostgreSQL
+```
+
+---
+
+## Infrastructure Layout
+
+Infrastructure configuration is stored in the `infra` directory.
+
+```
+infra/
+ ├── provision.sh
+ ├── docker-compose.yml
+ └── nginx/
+     └── nginx.conf
+```
+
+The virtual machine configuration is defined in:
+
+```
+Vagrantfile
+```
+
+---
+
+## Running the Application in the VM
+
+### Start the VM
+
+From the project root:
+
+```
+vagrant up
+```
+
+This will:
+
+* create the VM
+* install Docker inside the VM
+* prepare the environment for container deployment
+
+### SSH into the VM
+
+```
+vagrant ssh
+```
+
+### Deploy the containers
+
+Inside the VM:
+
+```
+cd /vagrant/infra
+docker-compose up -d
+```
+
+This starts:
+
+* PostgreSQL container
+* Student API container
+
+### Verify the API
+
+```
+curl http://localhost:8080/healthcheck
+```
+
+Expected response:
+
+```
+OK
+```
+
+### Stop the containers
+
+```
+docker-compose down
+```
+
+### Stop the VM
+
+From the host machine:
+
+```
+vagrant halt
+```
+
+---
+
+## Apple Silicon (UTM) Support
+
+This project was developed and tested on **Apple Silicon hardware (MacBook with M4 chip)**.
+
+Traditional Vagrant setups typically use **VirtualBox** as the virtualization provider.
+However, VirtualBox does **not support Apple Silicon processors**.
+
+To run Vagrant VMs on Apple Silicon, this project uses:
+
+```
+UTM + vagrant_utm provider
+```
+
+UTM is built on **QEMU** and provides ARM-compatible virtualization for macOS.
+
+---
+
+## Installing Vagrant on Apple Silicon
+
+### Install UTM
+
+Download from:
+
+```
+https://mac.getutm.app/
+```
+
+---
+
+### Install Vagrant
+
+Using Homebrew:
+
+```
+brew install vagrant
+```
+
+Verify installation:
+
+```
+vagrant --version
+```
+
+---
+
+### Install the UTM provider
+
+```
+vagrant plugin install vagrant_utm
+```
+
+Verify:
+
+```
+vagrant plugin list
+```
+
+Expected output:
+
+```
+vagrant_utm
+```
+
+---
+
+## Supported VM Image
+
+The project uses the following ARM-compatible Vagrant box:
+
+```
+utm/bookworm
+```
+
+This provides a **Debian 12 ARM64 environment** compatible with UTM.
+
+---
+
+## Tested Environment
+
+This infrastructure setup has been tested on:
+
+```
+MacBook (Apple Silicon M4)
+macOS
+UTM
+Vagrant
+Docker running inside VM
+```
+
+---
+
 ## Running Tests
 
 ```
@@ -229,6 +443,8 @@ Every push and pull request automatically runs:
 * static analysis (Detekt)
 * formatting checks (ktlint)
 * unit tests
+* Docker image build
+* Docker image publishing
 
 ---
 
@@ -240,15 +456,9 @@ The easiest way to verify your development environment is to run:
 ./scripts/setup-prerequisites.sh
 ```
 
-This script checks if all required tools are installed.
-
-### Required Tools
+This script checks if required tools are installed.
 
 ### Docker
-
-Docker is required to run the application.
-
-Check installation:
 
 ```
 docker --version
@@ -256,15 +466,13 @@ docker --version
 
 ### Make
 
-The project uses a Makefile to simplify common commands.
-
 ```
 make --version
 ```
 
 ### Java (Optional)
 
-Java is only required if running the application **locally without Docker**.
+Java is only required when running the application without Docker.
 
 The project uses **Java 21**.
 
@@ -310,6 +518,9 @@ src/main/resources
 src/test/kotlin  → unit tests
 
 .githooks        → git hooks (pre-commit, pre-push)
+
+infra            → infrastructure configuration (Vagrant deployment)
+
 scripts          → developer setup scripts
 postman          → API testing collection
 ```
@@ -324,3 +535,4 @@ Possible enhancements for future iterations:
 * pagination support
 * API documentation (OpenAPI / Swagger)
 * container registry publishing
+* horizontal scaling with load balancing
