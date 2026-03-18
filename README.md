@@ -15,6 +15,7 @@ The service is built using **Kotlin** and the **Micronaut** framework and follow
 * infrastructure provisioning using Vagrant
 * Kubernetes orchestration using Minikube
 * Helm charts for deployment management
+* Secrets management using Vault and External Secrets Operator
 
 Student data is stored in **PostgreSQL**.
 
@@ -70,6 +71,7 @@ The API supports:
 * **Infrastructure:** Vagrant
 * **Container Orchestration:** Kubernetes (Minikube)
 * **Deployment Management:** Helm
+* **Secrets Management:** Hashicorp Vault + External Secrets Operator
 
 ---
 
@@ -95,12 +97,6 @@ java -version
 
 ### Kubernetes Tools (required for K8s deployment)
 
-Install the following:
-
-* kubectl
-* Minikube
-* Helm
-
 ```
 brew install kubectl
 brew install minikube
@@ -119,7 +115,7 @@ helm version
 
 ## Run Using Docker (Recommended)
 
-The easiest way to run the project is using Docker.
+The easiest way to run the project locally is using Docker.
 
 ### Build the image
 
@@ -225,8 +221,6 @@ Vagrantfile
 # Installing Vagrant
 
 ## macOS (Using Homebrew)
-
-Install Vagrant:
 
 ```
 brew install vagrant
@@ -368,6 +362,12 @@ Student API pods (minikube-m02)
    │
    ▼
 PostgreSQL pod (minikube-m03)
+   │
+   ▼
+Vault + ESO (minikube-m04)
+   │
+   ▼
+Injects DB credentials as K8s Secrets
 ```
 
 ## Infrastructure Layout
@@ -375,87 +375,37 @@ PostgreSQL pod (minikube-m03)
 ```
 infra/
  └── helm/
-     ├── student-api/
-     │   ├── Chart.yaml
-     │   ├── values.yaml
-     │   └── templates/
-     │       ├── deployment.yaml
-     │       ├── service.yaml
-     │       └── configmap.yaml
-     └── postgres/
-         ├── Chart.yaml
-         ├── values.yaml
-         └── templates/
-             ├── deployment.yaml
-             ├── service.yaml
-             └── secret.yaml
+     ├── student-api/       → custom chart for the API
+     ├── postgres/          → custom chart for PostgreSQL
+     ├── vault/             → Hashicorp Vault chart
+     └── external-secrets/  → External Secrets Operator chart
 ```
 
 ---
 
-## Setting Up the Cluster
-
-### Start Minikube with 4 nodes
+## Start the Cluster
 
 ```
-minikube start --nodes 4 --driver=docker
+make k8s-up
 ```
 
-### Label the nodes
+This will:
 
-```
-kubectl label node minikube-m02 type=application
-kubectl label node minikube-m03 type=database
-kubectl label node minikube-m04 type=dependent_services
-```
-
-### Verify node labels
-
-```
-kubectl get nodes --show-labels
-```
-
----
-
-## Create Namespace
-
-```
-kubectl create namespace student-api
-```
-
----
-
-## Deploy Using Helm
-
-### Deploy PostgreSQL
-
-```
-helm install postgres infra/helm/postgres --namespace student-api
-```
-
-### Deploy Student API
-
-```
-helm install student-api infra/helm/student-api --namespace student-api
-```
-
-### Verify pods are running
-
-```
-kubectl get pods -n student-api
-```
-
-Both pods should show `Running` status.
+* Start Minikube with 4 nodes
+* Label nodes by role
+* Add required Helm repositories
+* Deploy Vault, ESO, PostgreSQL, and the Student API
+* Store DB credentials in Vault
 
 ---
 
 ## Access the API
 
 ```
-minikube service student-api -n student-api --url
+make k8s-run
 ```
 
-Keep the terminal open. Use the returned URL to make requests:
+Keep the terminal open and use the returned URL to make requests:
 
 ```
 http://127.0.0.1:<port>/healthcheck
@@ -463,42 +413,39 @@ http://127.0.0.1:<port>/healthcheck
 
 ---
 
-## Upgrade a Helm Release
+## Pause and Resume
 
-If you make changes to a chart and want to apply them without reinstalling:
+Pause the cluster without losing any data or configuration:
 
 ```
-helm upgrade student-api infra/helm/student-api --namespace student-api
-helm upgrade postgres infra/helm/postgres --namespace student-api
+make k8s-stop
+```
+
+Resume:
+
+```
+make k8s-start
 ```
 
 ---
 
-## Uninstall
-
-### Remove Helm releases
+## Full Teardown
 
 ```
-helm uninstall student-api -n student-api
-helm uninstall postgres -n student-api
+make k8s-down
 ```
 
-### Delete namespace
+This deletes the entire Minikube cluster and all resources.
+
+---
+
+## Upgrade a Helm Release
+
+If you make changes to a chart:
 
 ```
-kubectl delete namespace student-api
-```
-
-### Stop Minikube
-
-```
-minikube stop
-```
-
-### Delete Minikube cluster
-
-```
-minikube delete
+helm upgrade student-api infra/helm/student-api --namespace student-api
+helm upgrade postgres infra/helm/postgres --namespace student-api
 ```
 
 ---
@@ -568,7 +515,7 @@ postman/student-api.postman_collection.json
 Import the collection into Postman and run requests against the URL returned by:
 
 ```
-minikube service student-api -n student-api --url
+make k8s-run
 ```
 
 ---
@@ -589,25 +536,15 @@ src/main/resources
 src/test/kotlin  → unit tests
 
 infra
-  docker-compose.yml  → local Docker setup
-  provision.sh        → Vagrant VM provisioning
-  nginx/              → Nginx load balancer config
-  helm/               → Helm charts for Kubernetes deployment
-    student-api/      → custom chart for the API
-    postgres/         → custom chart for PostgreSQL
+  docker-compose.yml   → local Docker setup
+  provision.sh         → Vagrant VM provisioning
+  nginx/               → Nginx load balancer config
+  helm/                → Helm charts for Kubernetes deployment
+    student-api/       → custom chart for the API
+    postgres/          → custom chart for PostgreSQL
+    vault/             → Hashicorp Vault chart
+    external-secrets/  → External Secrets Operator chart
 
 scripts          → developer setup scripts
 postman          → API testing collection
 ```
-
----
-
-# Future Improvements
-
-Possible enhancements:
-
-* request validation improvements
-* pagination support
-* API documentation (OpenAPI / Swagger)
-* monitoring and observability stack
-* Vault and External Secrets Operator for secrets management
