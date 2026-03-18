@@ -13,6 +13,8 @@ The service is built using **Kotlin** and the **Micronaut** framework and follow
 * CI pipeline with GitHub Actions
 * containerized deployment using Docker
 * infrastructure provisioning using Vagrant
+* Kubernetes orchestration using Minikube
+* Helm charts for deployment management
 
 Student data is stored in **PostgreSQL**.
 
@@ -66,12 +68,16 @@ The API supports:
 * **CI/CD:** GitHub Actions
 * **Containerization:** Docker
 * **Infrastructure:** Vagrant
+* **Container Orchestration:** Kubernetes (Minikube)
+* **Deployment Management:** Helm
 
 ---
 
 # Running the Application
 
 ## Prerequisites
+
+### Basic Tools
 
 Install the following tools:
 
@@ -85,6 +91,28 @@ Verify installation:
 docker --version
 make --version
 java -version
+```
+
+### Kubernetes Tools (required for K8s deployment)
+
+Install the following:
+
+* kubectl
+* Minikube
+* Helm
+
+```
+brew install kubectl
+brew install minikube
+brew install helm
+```
+
+Verify installation:
+
+```
+kubectl version --client
+minikube version
+helm version
 ```
 
 ---
@@ -323,6 +351,158 @@ vagrant destroy
 
 ---
 
+# Deployment Using Kubernetes and Helm
+
+The project can be deployed on a local Kubernetes cluster using Minikube and Helm.
+
+## Architecture
+
+```
+Client
+   │
+   ▼
+K8s Service (NodePort)
+   │
+   ▼
+Student API pods (minikube-m02)
+   │
+   ▼
+PostgreSQL pod (minikube-m03)
+```
+
+## Infrastructure Layout
+
+```
+infra/
+ └── helm/
+     ├── student-api/
+     │   ├── Chart.yaml
+     │   ├── values.yaml
+     │   └── templates/
+     │       ├── deployment.yaml
+     │       ├── service.yaml
+     │       └── configmap.yaml
+     └── postgres/
+         ├── Chart.yaml
+         ├── values.yaml
+         └── templates/
+             ├── deployment.yaml
+             ├── service.yaml
+             └── secret.yaml
+```
+
+---
+
+## Setting Up the Cluster
+
+### Start Minikube with 4 nodes
+
+```
+minikube start --nodes 4 --driver=docker
+```
+
+### Label the nodes
+
+```
+kubectl label node minikube-m02 type=application
+kubectl label node minikube-m03 type=database
+kubectl label node minikube-m04 type=dependent_services
+```
+
+### Verify node labels
+
+```
+kubectl get nodes --show-labels
+```
+
+---
+
+## Create Namespace
+
+```
+kubectl create namespace student-api
+```
+
+---
+
+## Deploy Using Helm
+
+### Deploy PostgreSQL
+
+```
+helm install postgres infra/helm/postgres --namespace student-api
+```
+
+### Deploy Student API
+
+```
+helm install student-api infra/helm/student-api --namespace student-api
+```
+
+### Verify pods are running
+
+```
+kubectl get pods -n student-api
+```
+
+Both pods should show `Running` status.
+
+---
+
+## Access the API
+
+```
+minikube service student-api -n student-api --url
+```
+
+Keep the terminal open. Use the returned URL to make requests:
+
+```
+http://127.0.0.1:<port>/healthcheck
+```
+
+---
+
+## Upgrade a Helm Release
+
+If you make changes to a chart and want to apply them without reinstalling:
+
+```
+helm upgrade student-api infra/helm/student-api --namespace student-api
+helm upgrade postgres infra/helm/postgres --namespace student-api
+```
+
+---
+
+## Uninstall
+
+### Remove Helm releases
+
+```
+helm uninstall student-api -n student-api
+helm uninstall postgres -n student-api
+```
+
+### Delete namespace
+
+```
+kubectl delete namespace student-api
+```
+
+### Stop Minikube
+
+```
+minikube stop
+```
+
+### Delete Minikube cluster
+
+```
+minikube delete
+```
+
+---
+
 # Tested Environment
 
 The infrastructure setup has been tested on:
@@ -333,6 +513,8 @@ macOS
 UTM
 Vagrant
 Docker
+Minikube
+Helm
 ```
 
 ---
@@ -383,10 +565,10 @@ Location:
 postman/student-api.postman_collection.json
 ```
 
-Import the collection into Postman and run requests against:
+Import the collection into Postman and run requests against the URL returned by:
 
 ```
-http://localhost:8080
+minikube service student-api -n student-api --url
 ```
 
 ---
@@ -406,7 +588,13 @@ src/main/resources
 
 src/test/kotlin  → unit tests
 
-infra            → infrastructure configuration (Vagrant deployment)
+infra
+  docker-compose.yml  → local Docker setup
+  provision.sh        → Vagrant VM provisioning
+  nginx/              → Nginx load balancer config
+  helm/               → Helm charts for Kubernetes deployment
+    student-api/      → custom chart for the API
+    postgres/         → custom chart for PostgreSQL
 
 scripts          → developer setup scripts
 postman          → API testing collection
@@ -421,5 +609,5 @@ Possible enhancements:
 * request validation improvements
 * pagination support
 * API documentation (OpenAPI / Swagger)
-* container orchestration using Kubernetes
 * monitoring and observability stack
+* Vault and External Secrets Operator for secrets management
