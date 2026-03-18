@@ -9,9 +9,9 @@ nodeSelector:
   type: database
 
 auth:
-  database: students
-  username: postgres
-  password: postgres
+  database: ""
+  username: ""
+  password: ""
 
 service:
   port: 5432

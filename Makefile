@@ -82,7 +82,8 @@ k8s-up:
 		--set config.dbPort=$(DB_PORT) \
 		--set config.dbName=$(DB_NAME) \
 		--set secret.dbUser=$(DB_USER) \
-		--set secret.dbPassword=$(DB_PASSWORD)
+		--set secret.dbPassword=$(DB_PASSWORD) \
+		--set vaultToken=$(VAULT_TOKEN)
 
 k8s-run:
 	minikube service student-api -n student-api --url
