@@ -1,5 +1,5 @@
 .PHONY: build run stop logs db-up db-down local-build local-run local-test lint format \
-        k8s-up k8s-run k8s-argocd-password k8s-argocd-ui k8s-stop k8s-start k8s-down
+        k8s-up k8s-run k8s-argocd-password k8s-argocd-ui k8s-grafana-ui k8s-stop k8s-start k8s-down
 
 -include .env
 export
@@ -90,6 +90,16 @@ k8s-up:
 	envsubst < infra/argocd/repository-secret.yaml | kubectl apply -f -
 	kubectl apply -f infra/argocd/applications/postgres.yaml
 	kubectl apply -f infra/argocd/applications/student-api.yaml
+	kubectl create namespace observability
+	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+	helm repo add grafana https://grafana.github.io/helm-charts
+	helm repo update
+	helm install prometheus prometheus-community/kube-prometheus-stack \
+		--namespace observability \
+		-f infra/helm/observability/prometheus-values.yaml
+	helm install loki grafana/loki \
+		--namespace observability \
+		-f infra/helm/observability/loki-values.yaml
 
 k8s-run:
 	minikube service student-api -n student-api --url
@@ -99,6 +109,9 @@ k8s-argocd-password:
 
 k8s-argocd-ui:
 	minikube service argocd-server -n argocd --url
+
+k8s-grafana-ui:
+	minikube service prometheus-grafana -n observability --url
 
 k8s-stop:
 	minikube stop
