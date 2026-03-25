@@ -1,0 +1,24 @@
+nodeSelector:
+  type: dependent_services
+
+prometheus:
+  prometheusSpec:
+    nodeSelector:
+      type: dependent_services
+
+grafana:
+  nodeSelector:
+    type: dependent_services
+  service:
+    type: NodePort
+    nodePort: 30082
+  adminPassword: admin
+
+alertmanager:
+  enabled: false
+
+kubeStateMetrics:
+  enabled: true
+
+nodeExporter:
+  enabled: true
